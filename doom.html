@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+
+</head>
+<body>
+<script src="doom.js"></script>
+
+<div id='output' style='font-family: Courier'>Doom WAD Reader</div>
+
+<input type='file' id='fileloader'></input><br>
+
+
+<button id='image_tab' onclick="toggleVis('images')">Images</button><button id='map_tab' onclick="toggleVis('maps')">Maps</button><button id='sounds_tab'  onclick="toggleVis('sounds')">Sound and Music</button><button id='misc_tab'  onclick="toggleVis('misc')">Misc</button><br>
+
+
+<div id='images' style='position:absolute; top:70px; border:solid 1px black; visibility:hidden;'>
+
+<br>
+<table style='table-layout:fixed'>
+
+<tr>
+<td>
+Misc Images: <br>
+Enemy Sprites: <br>
+UI Elements: <br>
+
+</td>
+<td>
+<select id='miscImageSelector'></select><br>
+<select id='enemyImageSelector'></select><br>
+<select id='uiImageSelector'></select><br>
+</td>
+
+<td><canvas id='imageViewer'style='border:solid 1px black'></canvas>
+<canvas id='intermediate' style='visibility:hidden; display:none'></canvas></td>
+</tr>
+<tr>
+<td>Zoom:<br></td>
+<td>
+<select id='zoom' onchange=zoomImage()>
+<option value='1'>1x</option>
+<option value='2'>2x</option>
+<option value='4'>4x</option>
+</select>
+</td>
+<td><img id='finalImage'></img></td>
+</tr>
+</table>
+
+
+<br>
+Game Palette:<br>
+<canvas id='playpal'style='border:solid 1px black'></canvas>
+</div>
+
+
+<div id='maps' style='position:absolute; top:70px; border:solid 1px black; visibility:hidden;'></div>
+
+<div id='sounds'  style='position:absolute; top:70px; border:solid 1px black; visibility:hidden;'></div>
+
+<div id='misc' style='position:absolute; top:70px; border:solid 1px black; visibility:hidden;'>
+Text on Exiting Game:<br><div id='endoom' style='font-family: Courier'></div>
+</div>
+
+<script type="text/javascript">
+document.getElementById('fileloader').addEventListener('change', LoadFile, false);
+document.getElementById('miscImageSelector').addEventListener('change', changeImage, false);
+document.getElementById('enemyImageSelector').addEventListener('change', changeImage, false);
+document.getElementById('uiImageSelector').addEventListener('change', changeImage, false);
+
+</script>
+
+</body>
+</html>
