@@ -2,7 +2,7 @@
 <meta charset="utf-8">
 <html>
 <head>
-
+<title>DooM WAD Viewer</title>
 </head>
 <body>
 <script src="doom.js"></script>
@@ -12,7 +12,9 @@
 <input type='file' id='fileloader'></input><br>
 
 
-<button id='image_tab' onclick="toggleVis('images')">Images</button><button id='map_tab' onclick="toggleVis('maps')">Maps</button><button id='sounds_tab'  onclick="toggleVis('sounds')">Sound and Music</button><button id='misc_tab'  onclick="toggleVis('misc')">Misc</button><br>
+<button id='image_tab' onclick="toggleVis('images')">Images</button><button id='flat_tab' onclick="toggleVis('flats')">Floor/Ceiling Textures</button>
+<button id='textures_tab' onclick="toggleVis('textures')">Wall Textures</button>
+<button id='map_tab' onclick="toggleVis('maps')">Maps</button><button id='sounds_tab'  onclick="toggleVis('sounds')">Sound and Music</button><button id='misc_tab'  onclick="toggleVis('misc')">Misc</button><br>
 
 
 <div id='images' style='position:absolute; top:70px; border:solid 1px black; visibility:hidden;'>
@@ -33,7 +35,10 @@ UI Elements: <br>
 <select id='uiImageSelector'></select><br>
 </td>
 
-<td><canvas id='imageViewer'style='border:solid 1px black'></canvas>
+<td>
+
+Source Data:<br>
+<canvas id='imageViewer'style='border:solid 1px black'></canvas>
 <canvas id='intermediate' style='visibility:hidden; display:none'></canvas></td>
 </tr>
 <tr>
@@ -43,9 +48,15 @@ UI Elements: <br>
 <option value='1'>1x</option>
 <option value='2'>2x</option>
 <option value='4'>4x</option>
+<option value='8'>8x</option>
+<option value='16'>16x</option>
+
+
 </select>
 </td>
-<td><img id='finalImage'></img></td>
+<td>
+Output:<br>
+<img id='finalImage'></img></td>
 </tr>
 </table>
 
@@ -53,6 +64,35 @@ UI Elements: <br>
 <br>
 Game Palette:<br>
 <canvas id='playpal'style='border:solid 1px black'></canvas>
+</div>
+
+
+<div id='flats' style='position:absolute; top:70px; border:solid 1px black; visibility:hidden;'>
+Floor/Ceiling Texture: <select id='flatSelector'></select><br>
+Source Data:<br>
+<canvas id='flatViewer'style='border:solid 1px black'></canvas><canvas id='intermediateFlat' style='visibility:hidden; display:none'></canvas><br>
+Tiled Output:<br>
+<img id='finalFlats'></img>
+</div>
+
+<div id='textures' style='position:absolute; top:70px; border:solid 1px black; visibility:hidden;'>
+Wall Texture: 
+<select id='textureSelector'></select><br>
+
+<canvas id='textureViewer'style='border:solid 1px black'></canvas><canvas id='intermediateTexture' style='visibility:hidden; display:none'></canvas><br>
+Zoom: <select id='zoomTexture' onchange=zoomTexture()>
+<option value='1'>1x</option>
+<option value='2'>2x</option>
+<option value='4'>4x</option>
+<option value='8'>8x</option>
+<option value='16'>16x</option>
+
+
+</select><br>
+
+
+ Output:<br>
+<img id='finalTexture'></img>
 </div>
 
 
@@ -69,6 +109,8 @@ document.getElementById('fileloader').addEventListener('change', LoadFile, false
 document.getElementById('miscImageSelector').addEventListener('change', changeImage, false);
 document.getElementById('enemyImageSelector').addEventListener('change', changeImage, false);
 document.getElementById('uiImageSelector').addEventListener('change', changeImage, false);
+document.getElementById('flatSelector').addEventListener('change', changeFlat, false);
+document.getElementById('textureSelector').addEventListener('change', changeTexture, false);
 
 </script>
 

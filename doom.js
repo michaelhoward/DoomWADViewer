@@ -9,22 +9,22 @@ WAD.header = new Object();
 WAD.lumps = new Array();
 WAD.palette = new Array();
 var imageData;
+WAD.textures = new Array();
+WAD.pnames = new Array();
+WAD.patches = new Array();
 
 function LoadHeader()
 {
-console.log('Loading header');
-WAD.header.identification = read4ByteCharacters(0);
-WAD.header.numlumps = read4ByteNumber(4);
-WAD.header.infotableofs = read4ByteNumber(8);
-
-
-
+	console.log('Loading header');
+	WAD.header.identification = read4ByteCharacters(0);
+	WAD.header.numlumps = read4ByteNumber(4);
+	WAD.header.infotableofs = read4ByteNumber(8);
 }
 
 function LoadDirectory()
 {
 
-var directory = WAD.header.infotableofs;
+	var directory = WAD.header.infotableofs;
 
 	for (var i=0; i<WAD.header.numlumps; i++)
 	{
@@ -36,22 +36,58 @@ var directory = WAD.header.infotableofs;
 	directory = directory + 16;
 	
 	//WAD.lumps[i].content = window.atob(WAD.lumps[i].content);
-	
-	
-	
+
 	}
-
-
 }
 
 function parseWAD()
 {
 
+	var flats = false;
+	var patches = false;
+
 	for (var i=0; i<WAD.header.numlumps; i++)
 	{
 	
-	switch (WAD.lumps[i].name)
+	
+		if (flats == true)
+		{
+		// we're parsing flats, if its the end flag, stop parsing flats
+	
+		if (WAD.lumps[i].name == 'F_END\0\0\0')
+		{
+			flats = false;	
+		}
+		
+		else
+		{
+			addOptionToFlatSelector(i);
+		}
+	}
+	else if (patches == true)
 	{
+	// we're parsing patches
+	
+		if (WAD.lumps[i].name == 'P_END\0\0\0')
+		{
+			patches = false;	
+		}
+		
+		else
+		{
+			// now process the patch
+	
+			//ignore P1_START, P1_END, P2_START, P2_END
+			
+			// add all else
+			addToPatchLibrary(i);
+		}
+	}
+	
+	else
+	{
+		switch (WAD.lumps[i].name)
+		{
 	case "PLAYPAL\0":
 	// player palette
 	parseGamePalette(i);
@@ -255,9 +291,30 @@ function parseWAD()
 	
 	case "TEXTURE1":
 	case "TEXTURE2":
-	// textures
+	// texture directories
+	parseTextureDirectory(i);
 	break;
 	
+	//flats - floor/ceiling textures
+	case "F_START\0":
+	// flat starts
+	flats = true;
+	break;
+	
+	case "P_START\0":
+	patches = true;
+	break;
+	
+	
+	case "PNAMES\0\0":
+	parsePNAMES(i);
+	break;
+	
+	case "F_END\0\0\0":
+	break;
+	
+	
+	//demos
 	case "DEMO1\0\0\0":
 	case "DEMO2\0\0\0":
 	case "DEMO3\0\0\0":
@@ -307,18 +364,115 @@ function parseWAD()
 	case "DMXGUS\0\0":
 	break;
 	
+	
+	
+
+	
 	default:
 	console.log(WAD.lumps[i].name);
 	break;
 	
 	
+			}
+		}
 	}
-	
-	
-	}
+}
 
+function changeFlat(evt)
+{
+//console.log(evt);
+
+parseFlat(evt.target.value);
 
 }
+
+function changeTexture(evt)
+{
+//console.log(evt);
+	parseTexture(evt.target.value);
+}
+
+
+function parseFlat(i)
+{
+	var canvas = document.getElementById('flatViewer');
+	var ctx = canvas.getContext("2d");
+
+	//var flat_data = WAD.lumps[i].content;
+	var flat_offset = 0;
+	
+	canvas.width = 64;
+	canvas.height = 64;
+	
+	ctx.fillStyle = 'black';
+	ctx.fillRect(0,0,64,64);
+	
+	imageData = ctx.getImageData(0,0,64, 64);
+	
+	console.log('parsing flat '+i);
+	
+	for (var j=0; j<64; j++)
+	{
+		for (var k=0; k<64; k++)
+		{
+		var pal = read1ByteNumberFromContent(i, flat_offset);
+		//console.log(j+' '+k+' '+flat_offset+' '+pal);
+		setPixel(k, j, WAD.palette[pal].r, WAD.palette[pal].g, WAD.palette[pal].b, 255); 
+		flat_offset++;
+		
+		
+		}
+	}
+	
+	ctx.putImageData(imageData, 0,0);
+
+	tileFlat();
+}
+
+function tileFlat()
+{
+	var canvas = document.getElementById('flatViewer');
+	var ctx = canvas.getContext("2d");
+	
+	var intermediate = document.getElementById('intermediateFlat');
+	var ctx_i = intermediate.getContext("2d");
+	
+	var tiled = document.getElementById('finalFlats');
+	
+	
+	intermediate.width = canvas.width * 4;
+	intermediate.height = canvas.height * 4;
+	
+	
+	for (var i=0; i<4; i++)
+	{
+		for (var j=0; j<4; j++)
+		{
+			ctx_i.drawImage(canvas, 0, 0, 64, 64, i*64, j*64, 64, 64);
+		}
+	}
+	
+	var finalFlat = document.getElementById('finalFlats');
+	finalFlat.width = intermediate.width;
+	finalFlat.height = intermediate.height;
+	finalFlat.src = intermediate.toDataURL('image/png');
+}
+
+function addOptionToFlatSelector(i)
+{
+	var selector = document.getElementById('flatSelector');
+	var option = document.createElement('option');
+	var name = document.createTextNode(WAD.lumps[i].name);
+	
+	//console.log('adding option '+i+' '+name);
+	option.setAttribute('value', i);
+	option.appendChild(name);
+	selector.appendChild(option);
+	
+	
+}
+
+
 
 function addOptionToImageSelector(i, element)
 {
@@ -332,6 +486,21 @@ function addOptionToImageSelector(i, element)
 	option.appendChild(name);
 	selector.appendChild(option);
 }
+
+function addOptionToTextureSelector(j)
+{
+
+	var selector = document.getElementById('textureSelector');
+	var option = document.createElement('option');
+	var name = document.createTextNode(WAD.textures[j].name);
+	
+	//console.log('adding option '+i+' '+name);
+	option.setAttribute('value', j);
+	option.appendChild(name);
+	selector.appendChild(option);
+}
+
+
 
 function changeImage(evt)
 {
@@ -426,80 +595,7 @@ function parseImage(i)
 			}
 		}
 	}
-	/* TODO: Delete if no longer needed - old code
-	
-	
-	// For each column in the image
-	
-	for (var j=0; j<header_width; j++)
-	{
-	
-		var row_start = read1ByteNumberFromContent(i, WAD.lumps[i].columns[j].offset);
-		var row_count = read1ByteNumberFromContent(i, WAD.lumps[i].columns[j].offset + 1);
-		
-		var image_offset = WAD.lumps[i].columns[j].offset + 2;
-		
-		// temp fix to row issue
-		//var k = row_start;
-		//while (read1ByteNumberFromContent(i, image_offset) != 255)
-		//{
-		
-	
-		for (var k=row_start; k<row_count; k++)
-		{
-		
-			var pal = read1ByteNumberFromContent(i, image_offset);
-			//console.log(pal);
-			setPixel(j, k, WAD.palette[pal].r, WAD.palette[pal].g, WAD.palette[pal].b, 255); 
-		
-			image_offset = image_offset + 1;
-		//k++;
 
-			
-		}
-		
-		//console.log('finished first posts');
-		
-		// last one isnt drawn apparently....
-		image_offset = image_offset + 2;
-		
-		
-		//if (read1ByteNumberFromContent(i, image_offset) == 255)
-		//{
-		
-		console.log(row_count+' '+header_height);
-		if (row_count == header_height)
-		{
-		
-		// finish column
-		//console.log('column finished');
-		}
-		else
-		{
-
-		row_start = read1ByteNumberFromContent(i, image_offset);
-		row_count = read1ByteNumberFromContent(i, image_offset + 1);
-		image_offset = image_offset + 2;
-		
-		console.log('starting second post: '+row_start+' '+row_count);
-		
-		//console.log(row_start+' '+row_count+' '+image_offset+' '+read1ByteNumberFromContent(i, image_offset));
-		
-		for (var k=row_start; k<row_start + row_count; k++)
-			{
-				var pal = read1ByteNumberFromContent(i, image_offset);
-				console.log(pal);
-				setPixel(j, k, WAD.palette[pal].r, WAD.palette[pal].g, WAD.palette[pal].b, 255); 
-			
-				image_offset = image_offset + 1;
-
-			}
-		}
-		
-		
-	}
-	*/
-		
 	ctx.putImageData(imageData, 0,0);
 
 	zoomImage();
@@ -721,6 +817,252 @@ return result_text;
 }
 
 
+
+
+function parseSound(i)
+{
+
+}
+
+function addToPatchLibrary(i)
+{
+	WAD.patches[i] = new Object();
+	WAD.patches[i].id = i;
+}
+
+function parsePNAMES(i)
+{
+	console.log('Parsing PNAMES');
+	var pnameOffset = 0;
+	
+	var pnameCount = read4ByteNumberFromContent(i, pnameOffset);
+	pnameOffset = pnameOffset + 4;
+
+	for (var j=0; j<pnameCount; j++)
+	{
+		WAD.pnames[j] = new Object();
+		WAD.pnames[j].name = read8ByteCharactersFromContent(i, pnameOffset);
+		pnameOffset = pnameOffset + 8;
+	}
+}
+
+
+function parseTexture(i)
+{
+	console.log('Parsing texture = '+i+' '+WAD.textures[i].name);
+	
+	var canvas = document.getElementById('textureViewer');
+	var ctx = canvas.getContext("2d");
+	
+	canvas.width = WAD.textures[i].width;
+	canvas.height = WAD.textures[i].height;
+	
+	imageData = ctx.getImageData(0,0,canvas.width, canvas.height);
+	//console.log(imageData);
+	
+	
+	for (var j=0; j<WAD.textures[i].patchCount; j++)
+	{
+	// for each patch, apply them to the canvas
+	
+	//console.log('Apply this patch: '+WAD.textures[i].patches[j].pNum);
+	//console.log(WAD.pnames[WAD.textures[i].patches[j].pNum].name);
+	//console.log(findLump(WAD.pnames[WAD.textures[i].patches[j].pNum].name));
+	//console.log('Drawing Patch with Offsets: '+WAD.textures[i].patches[j].xOffset+' '+WAD.textures[i].patches[j].yOffset);
+	drawPatch(findLump(WAD.pnames[WAD.textures[i].patches[j].pNum].name),WAD.textures[i].patches[j].xOffset, WAD.textures[i].patches[j].yOffset );
+	
+	}
+
+
+ 	ctx.putImageData(imageData, 0,0);
+	zoomTexture();
+}
+
+
+function zoomTexture()
+{
+	var canvas = document.getElementById('textureViewer');
+	var ctx = canvas.getContext("2d");
+	
+	var intermediate = document.getElementById('intermediateTexture');
+	var ctx_i = intermediate.getContext("2d");
+	
+	var zoom = document.getElementById('zoomTexture');
+	
+	
+	intermediate.width = canvas.width * zoom.value;
+	intermediate.height = canvas.height * zoom.value;
+	ctx_i.drawImage(canvas, 0, 0, canvas.width * zoom.value, canvas.height * zoom.value);
+	
+	var finalImage = document.getElementById('finalTexture');
+	finalImage.width = intermediate.width;
+	finalImage.height = intermediate.height;
+	finalImage.src = intermediate.toDataURL('image/png');
+	
+
+
+}
+
+function drawPatch(i, xOffset, yOffset)
+{
+	
+	if (i == -1)
+	{
+	console.log('Invalid Patch');
+	return false;
+	}
+
+	var canvas = document.getElementById('textureViewer');
+	var ctx = canvas.getContext("2d");
+
+	var header_width = read2ByteNumberFromContent(i, 0);
+	var header_height = read2ByteNumberFromContent(i,2);
+	var header_left_offset = read2ByteNumberFromContent(i,4);
+	var header_top_offset = read2ByteNumberFromContent(i,6);
+
+	//canvas.width = header_width;
+	//canvas.height = header_height;
+	
+	var post_offset = 8;
+	
+	//create the columns array
+	WAD.lumps[i].columns = new Array();
+	
+	// for each column, save a record
+	
+	for (var j=0; j<header_width; j++)
+	{
+		//console.log('.');
+		WAD.lumps[i].columns[j] = new Object();
+		WAD.lumps[i].columns[j].offset = read4ByteNumberFromContent(i, post_offset);
+		post_offset = post_offset + 4;
+		//WAD.lumps[i].columns[j].data = new Array();
+	
+	}
+	
+	
+	// For each column in the image
+	for (var j=0; j<header_width; j++)
+	{
+	
+	// start looking for posts
+	
+		var column_complete = false;
+		var image_offset = WAD.lumps[i].columns[j].offset;
+	
+
+		while(column_complete == false)
+		{
+		
+			if (read1ByteNumberFromContent(i, image_offset) == 255)
+			{
+			//empty column... move to next column
+				column_complete = true;
+			}
+			else
+			{
+				var row_start = read1ByteNumberFromContent(i, image_offset);
+				var row_count = read1ByteNumberFromContent(i, image_offset + 1);
+		
+				image_offset = image_offset + 3; // row_start + count + not_drawn
+		
+				// start drawing
+			
+				for (var k=row_start; k<(row_start + row_count); k++)
+				{
+		
+					var pal = read1ByteNumberFromContent(i, image_offset);
+					//console.log(pal);
+					setPixel(j+xOffset, k+yOffset, WAD.palette[pal].r, WAD.palette[pal].g, WAD.palette[pal].b, 255); 
+		
+					image_offset++;
+				
+				}
+			// increment past the last not drawn byte
+			image_offset++;
+			}
+		}
+	}	
+}
+
+
+
+function parseTextureDirectory(i)
+{
+	console.log('Parsing Texture Directory - '+i);
+	var textureDir = WAD.lumps[i];
+
+
+	var textureOffset = 0;
+	var numTextures = read4ByteNumberFromContent(i, textureOffset);
+	
+	textureOffset = textureOffset + 4;
+	
+	//texture directory
+	for (var j=0; j<numTextures; j++)
+	{
+	WAD.textures[j] = new Object();
+	WAD.textures[j].offset = read4ByteNumberFromContent(i, textureOffset);
+	
+	textureOffset= textureOffset + 4;
+	
+	}
+	// texture definitions
+	for (var j=0; j<numTextures; j++)
+	{
+		WAD.textures[j].name = read8ByteCharactersFromContent(i, textureOffset);
+		textureOffset = textureOffset + 8;
+		console.log(WAD.textures[j].name);
+	
+		// there are 2x2 byte fields of 0 we should skip
+		textureOffset = textureOffset + 4;
+		
+		WAD.textures[j].width = read2ByteNumberFromContent(i, textureOffset);
+		textureOffset = textureOffset + 2;
+		WAD.textures[j].height = read2ByteNumberFromContent(i, textureOffset);
+		textureOffset = textureOffset + 2;
+		
+		// there are 2x2 byte fields of 0 we should skip
+		textureOffset = textureOffset + 4;
+		
+		WAD.textures[j].patchCount = read2ByteNumberFromContent(i, textureOffset);
+		textureOffset = textureOffset + 2;
+		
+		addOptionToTextureSelector(j);
+		
+		
+		WAD.textures[j].patches = new Array();
+		
+		for (var k=0; k<WAD.textures[j].patchCount; k++)
+		{
+		
+			WAD.textures[j].patches[k] = new Object();
+			WAD.textures[j].patches[k].xOffset = read2ByteNumberFromContent(i, textureOffset);
+			textureOffset = textureOffset + 2;
+		
+			WAD.textures[j].patches[k].yOffset = read2ByteNumberFromContent(i, textureOffset);
+			textureOffset = textureOffset + 2;
+		
+			WAD.textures[j].patches[k].pNum = read2ByteNumberFromContent(i, textureOffset);
+			textureOffset = textureOffset + 2;
+			
+			WAD.textures[j].patches[k].stepDir = read2ByteNumberFromContent(i, textureOffset);
+			textureOffset = textureOffset + 2;
+		
+			WAD.textures[j].patches[k].colorMap = read2ByteNumberFromContent(i, textureOffset);
+			textureOffset = textureOffset + 2;
+		
+		}	
+	}
+
+console.log('Parsing Texture Directory Complete');
+}
+
+
+
+
+
+
 function LoadFile(evt)
 {
 var reader = new FileReader();
@@ -775,6 +1117,14 @@ function read8ByteCharacters(location)
 	return output;
 }
 
+function read8ByteCharactersFromContent(i,location)
+{
+	var output = WAD.lumps[i].content.slice(location, location+8);
+	return output;
+}
+
+
+
 function read4ByteNumber(location)
 {
 
@@ -824,12 +1174,12 @@ return -1;
 
 function toggleVis(element)
 {
-
+document.getElementById('flats').style.visibility= "hidden";
 document.getElementById('images').style.visibility= "hidden";
 document.getElementById('maps').style.visibility= "hidden";
 document.getElementById('sounds').style.visibility= "hidden";
 document.getElementById('misc').style.visibility= "hidden";
-
+document.getElementById('textures').style.visibility= "hidden";
 document.getElementById(element).style.visibility= "visible";
 
 
