@@ -12,6 +12,9 @@ var imageData;
 WAD.textures = new Array();
 WAD.pnames = new Array();
 WAD.patches = new Array();
+WAD.maps = new Array();
+
+
 
 function LoadHeader()
 {
@@ -43,12 +46,17 @@ function LoadDirectory()
 function parseWAD()
 {
 
+	console.log('Parsing WAD lumps:');
+
 	var flats = false;
 	var patches = false;
-
+	var sprites = false;
+	var map = false;
+	
+	
 	for (var i=0; i<WAD.header.numlumps; i++)
 	{
-	
+		console.log(WAD.lumps[i].name);
 	
 		if (flats == true)
 		{
@@ -84,6 +92,25 @@ function parseWAD()
 		}
 	}
 	
+	else if (sprites == true)
+	{
+	// we're parsing sprites
+	if (WAD.lumps[i].name == 'S_END\0\0\0')
+		{
+			sprites = false;	
+		}
+		
+		else
+		{
+			// now process the patch
+	
+			//ignore P1_START, P1_END, P2_START, P2_END
+			
+			// add all else
+			addOptionToImageSelector(i, 'enemyImageSelector');
+		}
+	
+	}
 	else
 	{
 		switch (WAD.lumps[i].name)
@@ -202,7 +229,7 @@ function parseWAD()
 	
 	addOptionToImageSelector(i, 'uiImageSelector');
 	break;
-	
+	/*
 	// Enemy frames - pinky demon
 	case "SARGA1\0\0":
 	case "SARGA2A8":
@@ -281,6 +308,11 @@ function parseWAD()
 	
 	addOptionToImageSelector(i, 'enemyImageSelector');
 	break;
+	*/
+	 
+	 case "S_START\0":
+	 sprites = true;
+	 break;
 	
 	
 		//heretic images
@@ -322,17 +354,53 @@ function parseWAD()
 	
 	
 	// level data
+	
+	case "E1M1\0\0\0\0":
+	case "E1M2\0\0\0\0":
+	case "E1M3\0\0\0\0":
+	case "E1M4\0\0\0\0":
+	case "E1M5\0\0\0\0":
+	case "E1M6\0\0\0\0":
+	case "E1M7\0\0\0\0":
+	case "E1M8\0\0\0\0":
+	case "E1M9\0\0\0\0":
+	case "E2M1\0\0\0\0":
+	case "E2M2\0\0\0\0":
+	case "E2M3\0\0\0\0":
+	case "E2M4\0\0\0\0":
+	case "E2M5\0\0\0\0":
+	case "E2M6\0\0\0\0":
+	case "E2M7\0\0\0\0":
+	case "E2M8\0\0\0\0":
+	case "E2M9\0\0\0\0":
+	case "E3M1\0\0\0\0":
+	case "E3M2\0\0\0\0":
+	case "E3M3\0\0\0\0":
+	case "E3M4\0\0\0\0":
+	case "E3M5\0\0\0\0":
+	case "E3M6\0\0\0\0":
+	case "E3M7\0\0\0\0":
+	case "E3M8\0\0\0\0":
+	case "E3M9\0\0\0\0":
+	console.log(i);
+	addMap(i);
+	
+	
+	break;
 	case "THINGS\0\0":
 	//things
+	parseThings(i);
 	break;
 	
 	case "LINEDEFS":
+	 parseLineDefs(i);
 	break;
 	
 	case "SIDEDEFS":
 	break;
 	
 	case "VERTEXES":
+	parseVertices(i);
 	break;
 	
 	case "SEGS\0\0\0\0":
@@ -369,7 +437,7 @@ function parseWAD()
 
 	
 	default:
-	console.log(WAD.lumps[i].name);
+	
 	break;
 	
 	
@@ -377,6 +445,320 @@ function parseWAD()
 		}
 	}
 }
+
+function addMap(i)
+{
+	var map_num = WAD.maps.length;
+	WAD.maps[map_num] = new Object();
+	
+	
+	var selector = document.getElementById('mapSelector');
+	var option = document.createElement('option');
+	var name = document.createTextNode(WAD.lumps[i].name);
+	
+	option.setAttribute('value', map_num);
+	option.appendChild(name);
+	selector.appendChild(option);
+
+
+	
+}
+
+function parseThings(i)
+{
+	var currentMap = WAD.maps.length - 1;
+	
+	WAD.maps[currentMap].things = new Array();
+	
+	var thingCount = WAD.lumps[i].content.length / 10;
+
+	console.log('Parse Things for map: '+currentMap+' Thingcount: '+thingCount);
+	var thingOffset =0;
+
+	for (var j=0; j<thingCount; j++)
+	{
+		
+	WAD.maps[currentMap].things[j] = new Object();
+		WAD.maps[currentMap].things[j].xPos = read2ByteNumberFromContent(i, thingOffset);
+		thingOffset = thingOffset + 2;
+		
+		if (WAD.maps[currentMap].things[j].xPos > 32767)
+		{
+		WAD.maps[currentMap].things[j].xPos = parseInt(WAD.maps[currentMap].things[j].xPos) - 65536;
+		}
+		
+		
+		
+		WAD.maps[currentMap].things[j].yPos = read2ByteNumberFromContent(i, thingOffset);
+		thingOffset = thingOffset + 2;
+		
+		if (WAD.maps[currentMap].things[j].yPos > 32767)
+		{
+		WAD.maps[currentMap].things[j].yPos = parseInt(WAD.maps[currentMap].things[j].yPos) - 65536;
+		}
+		
+		
+		WAD.maps[currentMap].things[j].angle = read2ByteNumberFromContent(i, thingOffset);
+		thingOffset = thingOffset + 2;
+		
+		WAD.maps[currentMap].things[j].type = read2ByteNumberFromContent(i, thingOffset);
+		thingOffset = thingOffset + 2;
+		
+		WAD.maps[currentMap].things[j].options = read2ByteNumberFromContent(i, thingOffset);
+		thingOffset = thingOffset + 2;
+		
+		
+		
+		
+		
+	}
+
+}
+
+
+function parseVertices(i)
+{
+
+	
+
+	var currentMap = WAD.maps.length - 1;
+	WAD.maps[currentMap].vertices = new Array();
+	var vertexCount = WAD.lumps[i].content.length / 4;
+	var vertexOffset =0;
+
+	console.log('Parse Vertices for map: '+currentMap+' Vertex Count: '+vertexCount+' Lump: '+i);
+	
+
+
+
+	for (var j=0; j<vertexCount; j++)
+	{
+		WAD.maps[currentMap].vertices[j] = new Object();
+	
+		WAD.maps[currentMap].vertices[j].xPos = read2ByteNumberFromContent(i, vertexOffset);
+		
+		if (WAD.maps[currentMap].vertices[j].xPos > 32767)
+		{
+		WAD.maps[currentMap].vertices[j].xPos = parseInt(WAD.maps[currentMap].vertices[j].xPos) - 65536;
+		}
+		
+		vertexOffset = vertexOffset + 2;
+	
+		WAD.maps[currentMap].vertices[j].yPos = read2ByteNumberFromContent(i, vertexOffset);
+		
+		if (WAD.maps[currentMap].vertices[j].yPos > 32767)
+		{
+		WAD.maps[currentMap].vertices[j].yPos = parseInt(WAD.maps[currentMap].vertices[j].yPos) - 65536;
+		}
+		
+		vertexOffset = vertexOffset + 2;
+		
+		
+		if (j==0)
+		{
+		WAD.maps[currentMap].minX = 	WAD.maps[currentMap].vertices[j].xPos;
+		WAD.maps[currentMap].maxX = 	WAD.maps[currentMap].vertices[j].xPos;
+		
+		WAD.maps[currentMap].minY = 	WAD.maps[currentMap].vertices[j].yPos;
+		WAD.maps[currentMap].maxY = 	WAD.maps[currentMap].vertices[j].yPos;
+		
+		
+		}
+		else
+		{
+			if (WAD.maps[currentMap].vertices[j].xPos > WAD.maps[currentMap].maxX)
+			{
+				WAD.maps[currentMap].maxX = WAD.maps[currentMap].vertices[j].xPos;
+		
+			}
+			
+			if (WAD.maps[currentMap].vertices[j].xPos < WAD.maps[currentMap].minX)
+			{
+				WAD.maps[currentMap].minX = WAD.maps[currentMap].vertices[j].xPos;
+		
+			}
+			if (WAD.maps[currentMap].vertices[j].yPos > WAD.maps[currentMap].maxY)
+			{
+				WAD.maps[currentMap].maxY = WAD.maps[currentMap].vertices[j].yPos;
+		
+			}
+			
+			if (WAD.maps[currentMap].vertices[j].yPos < WAD.maps[currentMap].minY)
+			{
+				WAD.maps[currentMap].minY= WAD.maps[currentMap].vertices[j].yPos;
+		
+			}			
+			
+		}
+		
+	}
+}
+
+
+function parseLineDefs(i)
+{
+	var currentMap = WAD.maps.length - 1;
+	
+	WAD.maps[currentMap].linedefs = new Array();
+	
+	var lineCount = WAD.lumps[i].content.length / 14;
+
+	console.log('Parse Linedefs for map: '+currentMap+' Linecount: '+lineCount);
+	var lineOffset =0;
+
+	for (var j=0; j<lineCount; j++)
+	{
+		
+		WAD.maps[currentMap].linedefs[j] = new Object();
+		
+		WAD.maps[currentMap].linedefs[j].startVertex = read2ByteNumberFromContent(i, lineOffset);
+		lineOffset = lineOffset + 2;
+		
+		WAD.maps[currentMap].linedefs[j].endVertex = read2ByteNumberFromContent(i, lineOffset);
+		lineOffset = lineOffset + 2;
+		
+		WAD.maps[currentMap].linedefs[j].flags = read2ByteNumberFromContent(i, lineOffset);
+		lineOffset = lineOffset + 2;
+		
+		WAD.maps[currentMap].linedefs[j].type = read2ByteNumberFromContent(i, lineOffset);
+		lineOffset = lineOffset + 2;
+		
+		WAD.maps[currentMap].linedefs[j].trigger = read2ByteNumberFromContent(i, lineOffset);
+		lineOffset = lineOffset + 2;
+		
+		WAD.maps[currentMap].linedefs[j].rightSideDef = read2ByteNumberFromContent(i, lineOffset);
+		lineOffset = lineOffset + 2;
+		
+		WAD.maps[currentMap].linedefs[j].leftSideDef = read2ByteNumberFromContent(i, lineOffset);
+		lineOffset = lineOffset + 2;
+		
+	}
+
+
+}
+
+
+function changeMap(evt)
+{
+//console.log(evt);
+	drawMap(evt.target.value);
+}
+
+function drawMap(i)
+{
+	var canvas = document.getElementById('mapViewer');
+
+	canvas.width=WAD.maps[i].maxX - WAD.maps[i].minX;
+	canvas.height=WAD.maps[i].maxY - WAD.maps[i].minY;
+	
+	
+	//var mapDiv = 64;
+	//canvas.width=1024;
+	//canvas.height=1024;
+	
+	var ctx = canvas.getContext("2d");
+	
+	ctx.fillStyle = 'black';
+	ctx.fillRect(0,0,canvas.width,canvas.height);
+	
+	
+	var xOffset = 0 - WAD.maps[i].minX;
+	var yOffset = 0 - WAD.maps[i].minY;
+	
+	
+	//draw vertexes
+	ctx.fillStyle = 'yellow';
+	for (var j=0; j<WAD.maps[i].vertices.length; j++)
+	{
+	
+	 WAD.maps[i].vertices[j].calcxPos = Math.floor(WAD.maps[i].vertices[j].xPos + xOffset);
+	WAD.maps[i].vertices[j].calcyPos = Math.floor(WAD.maps[i].vertices[j].yPos + yOffset);
+	
+	
+	//flip the map
+	WAD.maps[i].vertices[j].calcyPos = canvas.height - WAD.maps[i].vertices[j].calcyPos;
+	
+	ctx.fillRect(WAD.maps[i].vertices[j].calcxPos-2, WAD.maps[i].vertices[j].calcyPos-2, 5, 5);
+	
+	}
+	
+	//draw linedefs
+	
+	for (var j=0; j<WAD.maps[i].linedefs.length; j++)
+	{
+		
+		var start = WAD.maps[i].linedefs[j].startVertex;
+		var end = WAD.maps[i].linedefs[j].endVertex;
+		
+
+		
+	
+		ctx.strokeStyle='red';
+		
+			//if two sided, draw in grey
+		if ((WAD.maps[i].linedefs[j].flags & 0x4) == 0x4)
+		{
+			ctx.strokeStyle='grey';
+		}
+		
+		
+		//if secret, draw in blue
+		if ((WAD.maps[i].linedefs[j].flags & 0x20) == 0x20)
+		{
+			ctx.strokeStyle='blue';
+		}
+
+		ctx.lineWidth=4;
+		ctx.beginPath();
+		ctx.moveTo( WAD.maps[i].vertices[start].calcxPos, WAD.maps[i].vertices[start].calcyPos);
+		ctx.lineTo( WAD.maps[i].vertices[end].calcxPos, WAD.maps[i].vertices[end].calcyPos);
+		ctx.stroke();
+	
+	}
+	
+	// draw the things
+	
+	for (var j=0; j<WAD.maps[i].things.length; j++)
+	{
+	
+	ctx.fillStyle = 'green';
+	
+	WAD.maps[i].things[j].calcxPos = Math.floor(WAD.maps[i].things[j].xPos + xOffset);
+	WAD.maps[i].things[j].calcyPos = Math.floor(WAD.maps[i].things[j].yPos + yOffset);
+	
+	
+	//flip the map
+	WAD.maps[i].things[j].calcyPos = canvas.height - WAD.maps[i].things[j].calcyPos;
+	
+	ctx.fillRect(WAD.maps[i].things[j].calcxPos-2, WAD.maps[i].things[j].calcyPos-2, 5, 5);
+	
+	}
+	
+zoomMap();
+}
+
+function zoomMap()
+{
+	var canvas = document.getElementById('mapViewer');
+	var ctx = canvas.getContext("2d");
+	
+	var intermediate = document.getElementById('intermediateMap');
+	var ctx_i = intermediate.getContext("2d");
+	
+
+	
+	intermediate.width = canvas.width /4;
+	intermediate.height = canvas.height /4;
+	ctx_i.drawImage(canvas, 0, 0, canvas.width /4, canvas.height /4);
+	
+	var finalImage = document.getElementById('finalMap');
+	finalImage.width = intermediate.width;
+	finalImage.height = intermediate.height;
+	finalImage.src = intermediate.toDataURL('image/png');
+
+
+}
+
 
 function changeFlat(evt)
 {

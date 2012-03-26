@@ -3,6 +3,19 @@
 <html>
 <head>
 <title>DooM WAD Viewer</title>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-29211605-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
 </head>
 <body>
 <script src="doom.js"></script>
@@ -25,7 +38,7 @@
 <tr>
 <td>
 Misc Images: <br>
-Enemy Sprites: <br>
+Game Sprites: <br>
 UI Elements: <br>
 
 </td>
@@ -96,7 +109,15 @@ Zoom: <select id='zoomTexture' onchange=zoomTexture()>
 </div>
 
 
-<div id='maps' style='position:absolute; top:70px; border:solid 1px black; visibility:hidden;'></div>
+<div id='maps' style='position:absolute; top:70px; border:solid 1px black; visibility:hidden;'>
+<select id='mapSelector'></select><br>
+Resized:<br>
+<img id='finalMap'></img><br>
+<canvas id='intermediateMap' style='visibility:hidden; display:none'></canvas>
+Original:<br>
+<canvas id='mapViewer'></canvas>
+
+</div>
 
 <div id='sounds'  style='position:absolute; top:70px; border:solid 1px black; visibility:hidden;'></div>
 
@@ -111,7 +132,7 @@ document.getElementById('enemyImageSelector').addEventListener('change', changeI
 document.getElementById('uiImageSelector').addEventListener('change', changeImage, false);
 document.getElementById('flatSelector').addEventListener('change', changeFlat, false);
 document.getElementById('textureSelector').addEventListener('change', changeTexture, false);
-
+document.getElementById('mapSelector').addEventListener('change', changeMap, false);
 </script>
 
 </body>
