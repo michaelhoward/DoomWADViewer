@@ -3,6 +3,10 @@
 <html>
 <head>
 <title>DooM WAD Viewer</title>
+<meta name="description" content="A HTML5/Javascript DOOM WAD viewer" />
+<meta name="keywords" content="DOOM, Heretic, WAD, iWAD, pWAD, HTML5,Javascript,viewer" />
+
+
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
@@ -20,17 +24,22 @@
 <body>
 <script src="doom.js"></script>
 
-<div id='output' style='font-family: Courier'>Doom WAD Reader</div>
+<div id='output' style='font-family: Courier'>Doom WAD Reader
+</div>
+<br>
 
-<input type='file' id='fileloader'></input><br>
+<input type='file' id='fileloader'></input><br><br>
 
+<div id='description' style='font-family: Courier; font-size:10px'>
+
+Free shareware files can be obtained: <a href="http://www.dosgamers.com/dos/dos-games/doom-heretic-hexen">here</a>. This tool is currently optimised for the Doom shareware WAD.</div> <br>
 
 <button id='image_tab' onclick="toggleVis('images')">Images</button><button id='flat_tab' onclick="toggleVis('flats')">Floor/Ceiling Textures</button>
 <button id='textures_tab' onclick="toggleVis('textures')">Wall Textures</button>
 <button id='map_tab' onclick="toggleVis('maps')">Maps</button><button id='sounds_tab'  onclick="toggleVis('sounds')">Sound and Music</button><button id='misc_tab'  onclick="toggleVis('misc')">Misc</button><br>
 
 
-<div id='images' style='position:absolute; top:70px; border:solid 1px black; visibility:hidden;'>
+<div id='images' style='position:absolute; top:150px; border:solid 1px black; visibility:hidden;'>
 
 <br>
 <table style='table-layout:fixed'>
@@ -80,7 +89,7 @@ Game Palette:<br>
 </div>
 
 
-<div id='flats' style='position:absolute; top:70px; border:solid 1px black; visibility:hidden;'>
+<div id='flats' style='position:absolute; top:150px; border:solid 1px black; visibility:hidden;'>
 Floor/Ceiling Texture: <select id='flatSelector'></select><br>
 Source Data:<br>
 <canvas id='flatViewer'style='border:solid 1px black'></canvas><canvas id='intermediateFlat' style='visibility:hidden; display:none'></canvas><br>
@@ -88,7 +97,7 @@ Tiled Output:<br>
 <img id='finalFlats'></img>
 </div>
 
-<div id='textures' style='position:absolute; top:70px; border:solid 1px black; visibility:hidden;'>
+<div id='textures' style='position:absolute; top:150px; border:solid 1px black; visibility:hidden;'>
 Wall Texture: 
 <select id='textureSelector'></select><br>
 
@@ -109,7 +118,7 @@ Zoom: <select id='zoomTexture' onchange=zoomTexture()>
 </div>
 
 
-<div id='maps' style='position:absolute; top:70px; border:solid 1px black; visibility:hidden;'>
+<div id='maps' style='position:absolute; top:150px; border:solid 1px black; visibility:hidden;'>
 <select id='mapSelector'></select><br>
 Resized:<br>
 <img id='finalMap'></img><br>
@@ -119,11 +128,16 @@ Original:<br>
 
 </div>
 
-<div id='sounds'  style='position:absolute; top:70px; border:solid 1px black; visibility:hidden;'></div>
+<div id='sounds'  style='position:absolute; top:150px; border:solid 1px black; visibility:hidden;'>
+<select id='sfxSelector'></select> <button id='playSFX' onclick='playSFX()'>Play</button><br> 
 
-<div id='misc' style='position:absolute; top:70px; border:solid 1px black; visibility:hidden;'>
+</div>
+
+<div id='misc' style='position:absolute; top:150px; border:solid 1px black; visibility:hidden;'>
 Text on Exiting Game:<br><div id='endoom' style='font-family: Courier'></div>
 </div>
+
+
 
 <script type="text/javascript">
 document.getElementById('fileloader').addEventListener('change', LoadFile, false);
@@ -133,6 +147,10 @@ document.getElementById('uiImageSelector').addEventListener('change', changeImag
 document.getElementById('flatSelector').addEventListener('change', changeFlat, false);
 document.getElementById('textureSelector').addEventListener('change', changeTexture, false);
 document.getElementById('mapSelector').addEventListener('change', changeMap, false);
+document.getElementById('sfxSelector').addEventListener('change', changeSFX, false);
+
+
+
 </script>
 
 </body>

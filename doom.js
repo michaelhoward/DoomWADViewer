@@ -15,18 +15,23 @@ WAD.patches = new Array();
 WAD.maps = new Array();
 
 
+WAD.context = new webkitAudioContext();
+//WAD.source = WAD.context.createBufferSource();
+
 
 function LoadHeader()
 {
-	console.log('Loading header');
+	console.log('Loading WAD header:');
 	WAD.header.identification = read4ByteCharacters(0);
 	WAD.header.numlumps = read4ByteNumber(4);
 	WAD.header.infotableofs = read4ByteNumber(8);
+	console.log('Header complete');
 }
 
 function LoadDirectory()
 {
 
+	console.log('Loading Lump Directory');
 	var directory = WAD.header.infotableofs;
 
 	for (var i=0; i<WAD.header.numlumps; i++)
@@ -41,6 +46,7 @@ function LoadDirectory()
 	//WAD.lumps[i].content = window.atob(WAD.lumps[i].content);
 
 	}
+	console.log('Lump Directory Complete');
 }
 
 function parseWAD()
@@ -56,7 +62,7 @@ function parseWAD()
 	
 	for (var i=0; i<WAD.header.numlumps; i++)
 	{
-		console.log(WAD.lumps[i].name);
+	console.log('LUMP: '+i+' '+WAD.lumps[i].name);
 	
 		if (flats == true)
 		{
@@ -113,8 +119,8 @@ function parseWAD()
 	}
 	else
 	{
-		switch (WAD.lumps[i].name)
-		{
+	switch (WAD.lumps[i].name)
+	{
 	case "PLAYPAL\0":
 	// player palette
 	parseGamePalette(i);
@@ -128,6 +134,7 @@ function parseWAD()
 	// text
 	case "ENDOOM\0\0":
 	case "ENDTEXT\0": //heretic
+	
 	// end text
 	document.getElementById('endoom').innerHTML = parseEnDoom(i);
 	break;
@@ -139,6 +146,7 @@ function parseWAD()
 	case "VICTORY2":
 	case "PFUB1\0\0\0":
 	case "PFUB2\0\0\0":
+	case "AUTOPAGE":	
 	
 	addOptionToImageSelector(i, 'miscImageSelector');
 	break;
@@ -173,10 +181,7 @@ function parseWAD()
 	case "STWEAP3\0":
 	case "STWEAP4\0":
 	case "STWEAP5\0":
-	
-	case "STFRAGS\0":
-	
-	
+		
 	case "STGNUM0\0":
 	case "STGNUM1\0":
 	case "STGNUM2\0":
@@ -200,115 +205,100 @@ function parseWAD()
 	case "STTNUM9\0":
 	
 	
+	case "STYSNUM0":
+	case "STYSNUM1":
+	case "STYSNUM2":
+	case "STYSNUM3":
+	case "STYSNUM4":
+	case "STYSNUM5":
+	case "STYSNUM6":
+	case "STYSNUM7":
+	case "STYSNUM8":
+	case "STYSNUM9":
 	
 	
 	case "STTMINUS":
+	case "STTPRCNT":
+	case "STKEYS0\0":
+	case "STKEYS1\0":
+	case "STKEYS2\0":
+	case "STKEYS3\0":
+	case "STKEYS4\0":
+	case "STKEYS5\0":
+
+	case "STCFN033":
+	case "STCFN034":
+	case "STCFN035":
+	case "STCFN036":
+	case "STCFN037":
+	case "STCFN038":
+	case "STCFN039":
+	case "STCFN040":
+	case "STCFN041":
+	case "STCFN042":
+	case "STCFN043":
+	case "STCFN044":
+	case "STCFN045":
+	case "STCFN046":
+	case "STCFN047":
+	case "STCFN048":
+	case "STCFN049":
+	case "STCFN050":
+	case "STCFN051":
+	case "STCFN052":
+	case "STCFN053":
+	case "STCFN054":
+	case "STCFN055":
+	case "STCFN056":
+	case "STCFN057":
+	case "STCFN058":
+	case "STCFN059":
+	case "STCFN060":
+	case "STCFN061":
+	case "STCFN062":
+	case "STCFN063":
+	case "STCFN064":
+	case "STCFN065":
+	case "STCFN066":
+	case "STCFN067":
+	case "STCFN068":
+	case "STCFN069":
+	case "STCFN070":
+	case "STCFN071":
+	case "STCFN072":
+	case "STCFN073":
+	case "STCFN074":
+	case "STCFN075":
+	case "STCFN076":
+	case "STCFN077":
+	case "STCFN078":
+	case "STCFN079":
+	case "STCFN080":
+	case "STCFN081":
+	case "STCFN082":
+	case "STCFN083":
+	case "STCFN084":
+	case "STCFN085":
+	case "STCFN086":
+	case "STCFN087":
+	case "STCFN088":
+	case "STCFN089":
+	case "STCFN090":
+	case "STCFN091":
+	case "STCFN092":
+	case "STCFN093":
+	case "STCFN094":
+	case "STCFN095":
+	case "STCFN121":
+	
+
 	
 	case "STDISK\0\0":
 	case "STCDROM\0":
 	case "STARMS\0\0":
 	
-	// doom guy face
-	case "STFST00\0":
-	case "STFST01\0":
-	case "STFST02\0":
-	case "STFST10\0":
-	case "STFST11\0":
-	case "STFST12\0":
-	case "STFST20\0":
-	case "STFST21\0":
-	case "STFST22\0":
-	case "STFST30\0":
-	case "STFST31\0":
-	case "STFST32\0":
-	case "STFST40\0":
-	case "STFST41\0":
-	case "STFST42\0":
-	
-	case "STFGOD0\0":
-	
 	addOptionToImageSelector(i, 'uiImageSelector');
 	break;
-	/*
-	// Enemy frames - pinky demon
-	case "SARGA1\0\0":
-	case "SARGA2A8":
-	case "SARGA3A7":
-	case "SARGA4A6":
-	case "SARGA5\0\0":
-	
-	case "SARGB1\0\0":
-	case "SARGB2B8":
-	case "SARGB3B7":
-	case "SARGB4B6":
-	case "SARGB5\0\0":
-	
-	case "SARGC1\0\0":
-	case "SARGC2C8":
-	case "SARGC3C7":
-	case "SARGC4C6":
-	case "SARGC5\0\0":
-	
-	case "SARGD1\0\0":
-	case "SARGD2D8":
-	case "SARGD3D7":
-	case "SARGD4D6":
-	case "SARGD5\0\0":
-	
-	case "SARGE1\0\0":
-	case "SARGE2\0\0":
-	case "SARGE3\0\0":
-	case "SARGE4\0\0":
-	case "SARGE5\0\0":
-	case "SARGE6\0\0":
-	case "SARGE7\0\0":
-	case "SARGE8\0\0":
-	
-	case "SARGF1\0\0":
-	case "SARGF2\0\0":
-	case "SARGF3\0\0":
-	case "SARGF4\0\0":
-	case "SARGF5\0\0":
-	case "SARGF6\0\0":
-	case "SARGF7\0\0":
-	case "SARGF8\0\0":
-	
-	case "SARGG1\0\0":
-	case "SARGG2\0\0":
-	case "SARGG3\0\0":
-	case "SARGG4\0\0":
-	case "SARGG5\0\0":
-	case "SARGG6\0\0":
-	case "SARGG7\0\0":
-	case "SARGG8\0\0":
-	
-	case "SARGH1\0\0":
-	case "SARGH2\0\0":
-	case "SARGH3\0\0":
-	case "SARGH4\0\0":
-	case "SARGH5\0\0":
-	case "SARGH6\0\0":
-	case "SARGH7\0\0":
-	case "SARGH8\0\0":
-	
-	case "SARGI0\0\0":
-	case "SARGJ0\0\0":
-	case "SARGK0\0\0":
-	case "SARGL0\0\0":
-	case "SARGM0\0\0":
-	case "SARGN0\0\0":
-	
-	// imp
-	case "TROOA1\0\0":
-	case "TROOA2A8":
-	case "TROOA3A7":
-	case "TROOA4A6":
-	case "TROOA5\0\0":	
-	
-	
-	addOptionToImageSelector(i, 'enemyImageSelector');
-	break;
-	*/
 	 
 	 case "S_START\0":
 	 sprites = true;
@@ -318,6 +308,8 @@ function parseWAD()
 		//heretic images
 	case "TITLE\0\0\0":
 	case "LOADING\0":
+	case "ORDER\0\0\0":
+	
 	break;
 	
 	
@@ -382,7 +374,7 @@ function parseWAD()
 	case "E3M7\0\0\0\0":
 	case "E3M8\0\0\0\0":
 	case "E3M9\0\0\0\0":
-	console.log(i);
+	//console.log(i);
 	addMap(i);
 	
 	
@@ -424,20 +416,118 @@ function parseWAD()
 	case "BEHAVIOR":
 	break;
 	
-	
-	//sound
+	//sound data
 	case "GENMIDI\0":
 	break;
 	
 	case "DMXGUS\0\0":
 	break;
 	
+	//heretic sfx - can't auto-load these like doom
+	case "CHAT\0\0\0\0":
+	case "ARTIUSE\0":
+	case "GFRAG\0\0\0":
+	case "GLDHIT\0\0":
+	case "GNTFUL\0\0":
+	case "GNTHIT\0\0":
+	case "GNTPOW\0\0":
+	case "GNTACT\0\0":
+	case "GNTUSE\0\0":
+	case "BOWSHT\0\0":
+	case "HRNHIT\0\0":
+	case "STFHIT\0\0":
+	case "STFPOW\0\0":
+	case "STFCRK\0\0":
+	case "BLSSHT\0\0":
+	case "BLSHIT\0\0":
+	case "PHOHIT\0\0":
+	case "IMPSIT\0\0":
+	case "IMPAT1\0\0":
+	case "IMPAT2\0\0":
+	case "IMPDTH\0\0":
+	case "IMPPAI\0\0":
+	case "MUMSIT\0\0":
+	case "MUMAT1\0\0":
+	case "MUMAT2\0\0":
+	case "MUMDTH\0\0":
+	case "MUMPAI\0\0":
+	case "KGTSIT\0\0":
+	case "KGTATK\0\0":
+	case "KGTAT2\0\0":
+	case "KGTDTH\0\0":
+	case "KGTPAI\0\0":
+	case "WIZSIT\0\0":
+	case "WIZATK\0\0":
+	case "WIZDTH\0\0":
+	case "WIZACT\0\0":
+	case "WIZPAI\0\0":
+	case "HEDSIT\0\0":
+	case "HEDAT1\0\0":
+	case "HEDAT2\0\0":
+	case "HEDAT3\0\0":
+	case "HEDDTH\0\0":
+	case "HEDACT\0\0":
+	case "HEDPAI\0\0":
+	case "PLROOF\0\0":
 	
 	
-
+	case "CHICPAI\0":
+	addOptionToSFXSelector(i);
+	break;
 	
 	default:
 	
+	if (WAD.lumps[i].name.slice(0,2) == "D_")
+	{ // MUSIC
+	
+		break;
+	
+	}
+	
+	if (WAD.lumps[i].name.slice(0,4) == "MUS_")
+	{ // MUSIC
+	
+		break;
+	
+	}
+	
+	
+	
+	if (WAD.lumps[i].name.slice(0,2) == "DS")
+	{ // sfx
+	addOptionToSFXSelector(i);
+	break;
+	
+	}
+	
+	if (WAD.lumps[i].name.slice(0,2) == "DP")
+	{ // sfx
+	break;
+	
+	}
+	
+	if (WAD.lumps[i].name.slice(0,3) == "STF")
+	{ // UI
+	
+	addOptionToImageSelector(i, 'uiImageSelector');
+	
+	break;
+	
+	}
+	
+		if (WAD.lumps[i].name.slice(0,2) == "M_")
+	{ // UI
+	
+	addOptionToImageSelector(i, 'uiImageSelector');
+	
+	break;
+	
+	}
+	
+	
+	
+	console.log('Unknown Lump: '+WAD.lumps[i].name+' at '+i);
+	addOptionToImageSelector(i, 'uiImageSelector');
 	break;
 	
 	
@@ -445,6 +535,78 @@ function parseWAD()
 		}
 	}
 }
+
+
+function addOptionToSFXSelector(i)
+{
+	
+	var selector = document.getElementById('sfxSelector');
+	var option = document.createElement('option');
+	var name = document.createTextNode(WAD.lumps[i].name);
+	
+	option.setAttribute('value', i);
+	option.appendChild(name);
+	selector.appendChild(option);
+	
+}
+
+function changeSFX(evt)
+{
+//console.log(evt);
+	parseSFX(evt.target.value);
+}
+
+
+function parseSFX(i)
+{
+	var sfxOffset = 0;
+	
+	var start = read2ByteNumberFromContent(i, sfxOffset);
+	sfxOffset = sfxOffset + 2;
+	
+	var sampleRate = read2ByteNumberFromContent(i, sfxOffset);
+	sfxOffset = sfxOffset + 2;
+	
+	var samples = read2ByteNumberFromContent(i, sfxOffset);
+	sfxOffset = sfxOffset + 2;
+	
+	var end = read2ByteNumberFromContent(i, sfxOffset);
+	sfxOffset = sfxOffset + 2;
+	
+	console.log(start+' '+sampleRate+' '+samples+' '+end);
+	
+	WAD.buffer = WAD.context.createBuffer(1, samples, sampleRate*2);
+	
+	var buf = WAD.buffer.getChannelData(0);
+	
+	for (var j=0; j<samples*2; j = j+2)
+	{
+	var sample = read1ByteNumberFromContent(i, sfxOffset);
+		buf[j] = sample/255;
+		buf[j+1] = sample/255;
+		//buf[j+2] = sample/255;
+		//buf[j+3] = sample/255;
+		
+		sfxOffset++;
+		
+	}
+	
+	playSFX();
+}
+
+function playSFX()
+{
+	//console.log('playing current effect');
+	
+	WAD.source = WAD.context.createBufferSource(0);
+	WAD.source.buffer = WAD.buffer;
+	WAD.source.connect(WAD.context.destination);
+	WAD.source.noteOn( WAD.context.currentTime);
+	
+	
+}
+
+
 
 function addMap(i)
 {
@@ -721,16 +883,109 @@ function drawMap(i)
 	for (var j=0; j<WAD.maps[i].things.length; j++)
 	{
 	
-	ctx.fillStyle = 'green';
 	
-	WAD.maps[i].things[j].calcxPos = Math.floor(WAD.maps[i].things[j].xPos + xOffset);
-	WAD.maps[i].things[j].calcyPos = Math.floor(WAD.maps[i].things[j].yPos + yOffset);
+		switch(WAD.maps[i].things[j].type)
+		{
+		// player spawns
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 11:
+		case 14:
+		ctx.fillStyle = 'white';
+		break;
+		
+		
+		//enemies
+		case 3004:
+		case 84:
+		case 9:
+		case 65:
+		case 3001:
+		case 3002:
+		case 58:
+		case 3006:
+		case 3005:
+		case 69:
+		case 3003:
+		case 68:
+		case 71:
+		case 66:
+		case 67:
+		case 64:
+		case 7:
+		case 16:
+		case 88:
+		case 89:
+		case 87:
+		ctx.fillStyle = 'purple';
+		break;
+		
+		case 2005:
+		case 2001:
+		case 82:
+		case 2002:
+		case 2003:
+		case 2004:
+		case 2005:
+		case 2006:
+		ctx.fillStyle = 'lightyellow';
+		
+		break;
+		
+		
+		case 2007:
+		case 2008:
+		case 2010:
+		case 2047:
+		case 2048:
+		case 2049:
+		case 2046:
+		case 17:
+		case 8:
+		ctx.fillStyle = 'darkyellow';
+		break;
+		
+		
+		case 2011:
+		case 2012:
+		case 2014:
+		case 2015:
+		case 2018:
+		case 2019:
+		case 83:
+		case 2013:
+		case 2022:
+		case 2023:
+		case 2024:
+		case 2025:
+		case 2026:
+		case 2045:
+		case 5:
+		case 40:
+		case 13:
+		case 38:
+		case 6:
+		case 39:
+		ctx.fillStyle = 'orange';
+		break;
+		
+		
+		default:
+		ctx.fillStyle = 'green';
+		break;
+		
+		}
+		
+		WAD.maps[i].things[j].calcxPos = Math.floor(WAD.maps[i].things[j].xPos + xOffset);
+		WAD.maps[i].things[j].calcyPos = Math.floor(WAD.maps[i].things[j].yPos + yOffset);
 	
 	
-	//flip the map
-	WAD.maps[i].things[j].calcyPos = canvas.height - WAD.maps[i].things[j].calcyPos;
+		//flip the y pos
+		WAD.maps[i].things[j].calcyPos = canvas.height - WAD.maps[i].things[j].calcyPos;
 	
-	ctx.fillRect(WAD.maps[i].things[j].calcxPos-2, WAD.maps[i].things[j].calcyPos-2, 5, 5);
+		ctx.fillRect(WAD.maps[i].things[j].calcxPos-3, WAD.maps[i].things[j].calcyPos-3, 7, 7);
 	
 	}
 	
@@ -840,6 +1095,7 @@ function tileFlat()
 	finalFlat.src = intermediate.toDataURL('image/png');
 }
 
+
 function addOptionToFlatSelector(i)
 {
 	var selector = document.getElementById('flatSelector');
@@ -894,7 +1150,7 @@ parseImage(evt.target.value);
 
 function parseImage(i)
 {
-	console.log('Loading image');
+	console.log('Loading Image: '+i);
 	var canvas = document.getElementById('imageViewer');
 	var ctx = canvas.getContext("2d");
 
@@ -910,25 +1166,20 @@ function parseImage(i)
 	
 	var post_offset = 8;
 	
-	
 	ctx.fillStyle = 'black';
 	ctx.fillRect(0,0,header_width,header_height);
 	
 	imageData = ctx.getImageData(0,0,header_width, header_height);
-	//console.log(imageData);
 	
 	//create the columns array
 	WAD.lumps[i].columns = new Array();
 	
 	// for each column, save a record
-	
 	for (var j=0; j<header_width; j++)
 	{
-		//console.log('.');
 		WAD.lumps[i].columns[j] = new Object();
 		WAD.lumps[i].columns[j].offset = read4ByteNumberFromContent(i, post_offset);
 		post_offset = post_offset + 4;
-		//WAD.lumps[i].columns[j].data = new Array();
 	
 	}
 	
@@ -1042,19 +1293,7 @@ function parseEnDoom(i)
 	var source_text = "";
 	var result_text = "";
 	
-	
-
-		//if (WAD.lumps[i].name != "ENDOOM\0\0")
-		//{
-		//return 'fail';
-		//}
-		//else
-		//{
-			source_text = WAD.lumps[i].content;
-		//}
-
-
-	//console.log(source_text);
+	source_text = WAD.lumps[i].content;
 
 	for (var j=0; j<4000; j = j+2)
 	{
@@ -1167,8 +1406,7 @@ function parseEnDoom(i)
 	break;
 	}	
 	
-	
-	//console.log(source_text.charCodeAt(j+1)+" "+parseInt(source_text.charCodeAt(j+1)&0xF)+' '+parseInt(source_text.charCodeAt(j+1)&0x70));
+
 	
 		if (j%160 == 0)
 	{
@@ -1179,16 +1417,10 @@ function parseEnDoom(i)
 	
 	if (character == ' ')
 	{
-	character = '&nbsp;';
+		character = '&nbsp;';
 	}
 	
 	result_text = result_text + "<span style='color:"+f_color+"; background-color:"+b_color+";'>"+character+"</span>";
-	
-	
-
-	
-	//	result_text = result_text + source_text[j];
-	
 	
 	
 	}
@@ -1201,10 +1433,6 @@ return result_text;
 
 
 
-function parseSound(i)
-{
-
-}
 
 function addToPatchLibrary(i)
 {
@@ -1226,7 +1454,11 @@ function parsePNAMES(i)
 		WAD.pnames[j].name = read8ByteCharactersFromContent(i, pnameOffset);
 		pnameOffset = pnameOffset + 8;
 	}
+
+	console.log('Parsing PNAMES complete');
 }
+
+
 
 
 function parseTexture(i)
@@ -1246,11 +1478,6 @@ function parseTexture(i)
 	for (var j=0; j<WAD.textures[i].patchCount; j++)
 	{
 	// for each patch, apply them to the canvas
-	
-	//console.log('Apply this patch: '+WAD.textures[i].patches[j].pNum);
-	//console.log(WAD.pnames[WAD.textures[i].patches[j].pNum].name);
-	//console.log(findLump(WAD.pnames[WAD.textures[i].patches[j].pNum].name));
-	//console.log('Drawing Patch with Offsets: '+WAD.textures[i].patches[j].xOffset+' '+WAD.textures[i].patches[j].yOffset);
 	drawPatch(findLump(WAD.pnames[WAD.textures[i].patches[j].pNum].name),WAD.textures[i].patches[j].xOffset, WAD.textures[i].patches[j].yOffset );
 	
 	}
@@ -1394,7 +1621,7 @@ function parseTextureDirectory(i)
 	{
 		WAD.textures[j].name = read8ByteCharactersFromContent(i, textureOffset);
 		textureOffset = textureOffset + 8;
-		console.log(WAD.textures[j].name);
+		//console.log(WAD.textures[j].name);
 	
 		// there are 2x2 byte fields of 0 we should skip
 		textureOffset = textureOffset + 4;
@@ -1473,14 +1700,12 @@ function errorHandler(evt)
 function completeHandler(evt)
 {
 
+	WAD.file = evt.target.result;
 
-WAD.file = evt.target.result;
+	LoadHeader();
+	LoadDirectory();
 
-LoadHeader();
-LoadDirectory();
-
-parseWAD();
-
+	parseWAD();
 }
 
 // Utility Functions
