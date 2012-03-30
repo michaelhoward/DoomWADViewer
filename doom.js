@@ -14,10 +14,7 @@ WAD.pnames = new Array();
 WAD.patches = new Array();
 WAD.maps = new Array();
 
-
 WAD.context = new webkitAudioContext();
-//WAD.source = WAD.context.createBufferSource();
-
 
 function LoadHeader()
 {
@@ -62,7 +59,7 @@ function parseWAD()
 	
 	for (var i=0; i<WAD.header.numlumps; i++)
 	{
-	console.log('LUMP: '+i+' '+WAD.lumps[i].name);
+	//console.log('LUMP: '+i+' '+WAD.lumps[i].name);
 	
 		if (flats == true)
 		{
@@ -291,7 +288,11 @@ function parseWAD()
 	case "STCFN095":
 	case "STCFN121":
 	
-
+	case "STPB0\0\0\0":
+	case "STPB1\0\0\0":
+	case "STPB2\0\0\0":
+	case "STPB3\0\0\0":
+	
 	
 	case "STDISK\0\0":
 	case "STCDROM\0":
@@ -469,9 +470,47 @@ function parseWAD()
 	case "HEDACT\0\0":
 	case "HEDPAI\0\0":
 	case "PLROOF\0\0":
-	
-	
+	case "PLRPAI\0\0":
+	case "PLRDTH\0\0":
+	case "PLRWDTH\0":
+	case "PLRCDTH\0":
+	case "GIBDTH\0\0":
+	case "ITEMUP\0\0":
+	case "WPNUP\0\0\0":
+	case "ARTIUP\0\0":
+	case "KEYUP\0\0\0":
+	case "TELEPT\0\0":
+	case "DOROPN\0\0":
+	case "DORCLS\0\0":
+	case "DORMOV\0\0":
+	case "SWITCH\0\0":
+	case "PSTART\0\0":
+	case "PSTOP\0\0\0":
+	case "STNMOV\0\0":
+	case "WIND\0\0\0\0":
 	case "CHICPAI\0":
+	case "CHICATK\0":
+	case "CHICDTH\0":
+	case "CHICACT\0":
+	case "CHICPK1\0":
+	case "CHICPK2\0":
+	case "CHICPK3\0":
+	case "RIPSLOP\0":
+	case "NEWPOD\0\0":
+	case "PODEXP\0\0":
+	case "BURN\0\0\0\0":
+	case "GLOOP\0\0\0":
+	case "MUMHED\0\0":
+	case "RESPAWN\0":
+	case "AMB3\0\0\0\0":
+	case "AMB4\0\0\0\0":
+	case "AMB5\0\0\0\0":
+	case "AMB6\0\0\0\0":
+	case "AMB7\0\0\0\0":
+	case "AMB9\0\0\0\0":
+	case "AMB10\0\0\0":
+	case "AMB11\0\0\0":
+	
 	addOptionToSFXSelector(i);
 	break;
 	
@@ -514,6 +553,25 @@ function parseWAD()
 	break;
 	
 	}
+	
+		if (WAD.lumps[i].name.slice(0,2) == "WI")
+	{ // UI
+	
+	addOptionToImageSelector(i, 'uiImageSelector');
+	
+	break;
+	
+	}
+	
+			if (WAD.lumps[i].name.slice(0,4) == "BRDR")
+	{ // UI
+	
+	addOptionToImageSelector(i, 'uiImageSelector');
+	
+	break;
+	
+	}
+	
 	
 		if (WAD.lumps[i].name.slice(0,2) == "M_")
 	{ // UI
@@ -930,7 +988,7 @@ function drawMap(i)
 		case 2004:
 		case 2005:
 		case 2006:
-		ctx.fillStyle = 'lightyellow';
+		ctx.fillStyle = 'blue';
 		
 		break;
 		
@@ -944,7 +1002,7 @@ function drawMap(i)
 		case 2046:
 		case 17:
 		case 8:
-		ctx.fillStyle = 'darkyellow';
+		ctx.fillStyle = 'red';
 		break;
 		
 		

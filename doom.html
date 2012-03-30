@@ -49,7 +49,6 @@ Free shareware files can be obtained: <a href="http://www.dosgamers.com/dos/dos-
 Misc Images: <br>
 Game Sprites: <br>
 UI Elements: <br>
-
 </td>
 <td>
 <select id='miscImageSelector'></select><br>
@@ -60,7 +59,7 @@ UI Elements: <br>
 <td>
 
 Source Data:<br>
-<canvas id='imageViewer'style='border:solid 1px black'></canvas>
+<canvas id='imageViewer'style='border:solid 1px black' width=1px height=1px></canvas>
 <canvas id='intermediate' style='visibility:hidden; display:none'></canvas></td>
 </tr>
 <tr>
@@ -72,8 +71,6 @@ Source Data:<br>
 <option value='4'>4x</option>
 <option value='8'>8x</option>
 <option value='16'>16x</option>
-
-
 </select>
 </td>
 <td>
@@ -92,7 +89,7 @@ Game Palette:<br>
 <div id='flats' style='position:absolute; top:150px; border:solid 1px black; visibility:hidden;'>
 Floor/Ceiling Texture: <select id='flatSelector'></select><br>
 Source Data:<br>
-<canvas id='flatViewer'style='border:solid 1px black'></canvas><canvas id='intermediateFlat' style='visibility:hidden; display:none'></canvas><br>
+<canvas id='flatViewer'style='border:solid 1px black' width=1px height=1px></canvas><canvas id='intermediateFlat' style='visibility:hidden; display:none'></canvas><br>
 Tiled Output:<br>
 <img id='finalFlats'></img>
 </div>
@@ -101,7 +98,7 @@ Tiled Output:<br>
 Wall Texture: 
 <select id='textureSelector'></select><br>
 
-<canvas id='textureViewer'style='border:solid 1px black'></canvas><canvas id='intermediateTexture' style='visibility:hidden; display:none'></canvas><br>
+<canvas id='textureViewer'style='border:solid 1px black' width=1px height=1px></canvas><canvas id='intermediateTexture' style='visibility:hidden; display:none'></canvas><br>
 Zoom: <select id='zoomTexture' onchange=zoomTexture()>
 <option value='1'>1x</option>
 <option value='2'>2x</option>
@@ -119,12 +116,21 @@ Zoom: <select id='zoomTexture' onchange=zoomTexture()>
 
 
 <div id='maps' style='position:absolute; top:150px; border:solid 1px black; visibility:hidden;'>
+Key:<br>
+<table>
+<tr><td style='background-color:white'>&nbsp;&nbsp;</td><td>Player Spawns</td></tr>
+<tr><td style='background-color:purple'>&nbsp;&nbsp;</td><td>Enemies</td></tr>
+<tr><td style='background-color:blue'>&nbsp;&nbsp;</td><td>Weapons</td></tr>
+<tr><td style='background-color:red'>&nbsp;&nbsp;</td><td>Ammo</td></tr>
+<tr><td style='background-color:orange'>&nbsp;&nbsp;</td><td>Pickups</td></tr>
+<tr><td style='background-color:green'>&nbsp;&nbsp;</td><td>Other</td></tr>
+</table>
 <select id='mapSelector'></select><br>
 Resized:<br>
 <img id='finalMap'></img><br>
-<canvas id='intermediateMap' style='visibility:hidden; display:none'></canvas>
+<canvas id='intermediateMap' style='visibility:hidden; display:none'width=1px height=1px></canvas>
 Original:<br>
-<canvas id='mapViewer'></canvas>
+<canvas id='mapViewer' width=1px height=1px></canvas>
 
 </div>
 
