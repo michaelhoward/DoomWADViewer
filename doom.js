@@ -27,21 +27,19 @@ function LoadHeader()
 
 function LoadDirectory()
 {
-
 	console.log('Loading Lump Directory');
 	var directory = WAD.header.infotableofs;
 
 	for (var i=0; i<WAD.header.numlumps; i++)
 	{
-	WAD.lumps[i] = new Object();
-	WAD.lumps[i].filepos = read4ByteNumber(directory);
-	WAD.lumps[i].size = read4ByteNumber(directory+4);
-	WAD.lumps[i].name = read8ByteCharacters(directory+8);
-	WAD.lumps[i].content = WAD.file.slice(WAD.lumps[i].filepos , WAD.lumps[i].filepos + WAD.lumps[i].size);
-	directory = directory + 16;
+		WAD.lumps[i] = new Object();
+		WAD.lumps[i].filepos = read4ByteNumber(directory);
+		WAD.lumps[i].size = read4ByteNumber(directory+4);
+		WAD.lumps[i].name = read8ByteCharacters(directory+8);
+		WAD.lumps[i].content = WAD.file.slice(WAD.lumps[i].filepos , WAD.lumps[i].filepos + WAD.lumps[i].size);
+		directory = directory + 16;
 	
-	//WAD.lumps[i].content = window.atob(WAD.lumps[i].content);
-
+		//WAD.lumps[i].content = window.atob(WAD.lumps[i].content);
 	}
 	console.log('Lump Directory Complete');
 }
@@ -639,7 +637,7 @@ function parseSFX(i)
 	
 	for (var j=0; j<samples*2; j = j+2)
 	{
-	var sample = read1ByteNumberFromContent(i, sfxOffset);
+		var sample = read1ByteNumberFromContent(i, sfxOffset);
 		buf[j] = sample/255;
 		buf[j+1] = sample/255;
 		//buf[j+2] = sample/255;
@@ -698,7 +696,7 @@ function parseThings(i)
 	for (var j=0; j<thingCount; j++)
 	{
 		
-	WAD.maps[currentMap].things[j] = new Object();
+		WAD.maps[currentMap].things[j] = new Object();
 		WAD.maps[currentMap].things[j].xPos = read2ByteNumberFromContent(i, thingOffset);
 		thingOffset = thingOffset + 2;
 		
@@ -714,7 +712,7 @@ function parseThings(i)
 		
 		if (WAD.maps[currentMap].things[j].yPos > 32767)
 		{
-		WAD.maps[currentMap].things[j].yPos = parseInt(WAD.maps[currentMap].things[j].yPos) - 65536;
+			WAD.maps[currentMap].things[j].yPos = parseInt(WAD.maps[currentMap].things[j].yPos) - 65536;
 		}
 		
 		
@@ -755,21 +753,13 @@ function parseVertices(i)
 	{
 		WAD.maps[currentMap].vertices[j] = new Object();
 	
-		WAD.maps[currentMap].vertices[j].xPos = read2ByteNumberFromContent(i, vertexOffset);
+		WAD.maps[currentMap].vertices[j].xPos = read2ByteSignedNumberFromContent(i, vertexOffset);
 		
-		if (WAD.maps[currentMap].vertices[j].xPos > 32767)
-		{
-		WAD.maps[currentMap].vertices[j].xPos = parseInt(WAD.maps[currentMap].vertices[j].xPos) - 65536;
-		}
 		
 		vertexOffset = vertexOffset + 2;
 	
-		WAD.maps[currentMap].vertices[j].yPos = read2ByteNumberFromContent(i, vertexOffset);
+		WAD.maps[currentMap].vertices[j].yPos = read2ByteSignedNumberFromContent(i, vertexOffset);
 		
-		if (WAD.maps[currentMap].vertices[j].yPos > 32767)
-		{
-		WAD.maps[currentMap].vertices[j].yPos = parseInt(WAD.maps[currentMap].vertices[j].yPos) - 65536;
-		}
 		
 		vertexOffset = vertexOffset + 2;
 		
@@ -1112,7 +1102,7 @@ function parseFlat(i)
 		{
 		var pal = read1ByteNumberFromContent(i, flat_offset);
 		//console.log(j+' '+k+' '+flat_offset+' '+pal);
-		setPixel(k, j, WAD.palette[pal].r, WAD.palette[pal].g, WAD.palette[pal].b, 255); 
+		setPixel(k, canvas.width, j, canvas.height, WAD.palette[pal].r, WAD.palette[pal].g, WAD.palette[pal].b, 255); 
 		flat_offset++;
 		
 		
@@ -1274,7 +1264,7 @@ function parseImage(i)
 		
 					var pal = read1ByteNumberFromContent(i, image_offset);
 					//console.log(pal);
-					setPixel(j, k, WAD.palette[pal].r, WAD.palette[pal].g, WAD.palette[pal].b, 255); 
+					setPixel(j, canvas.width, k, canvas.height, WAD.palette[pal].r, WAD.palette[pal].g, WAD.palette[pal].b, 255); 
 		
 					image_offset++;
 		
@@ -1536,7 +1526,7 @@ function parseTexture(i)
 	for (var j=0; j<WAD.textures[i].patchCount; j++)
 	{
 	// for each patch, apply them to the canvas
-	drawPatch(findLump(WAD.pnames[WAD.textures[i].patches[j].pNum].name),WAD.textures[i].patches[j].xOffset, WAD.textures[i].patches[j].yOffset );
+	drawPatch(findLump(WAD.pnames[WAD.textures[i].patches[j].pNum].name),WAD.textures[i].patches[j].xOffset, WAD.textures[i].patches[j].yOffset, canvas.width, canvas.height );
 	
 	}
 
@@ -1570,7 +1560,7 @@ function zoomTexture()
 
 }
 
-function drawPatch(i, xOffset, yOffset)
+function drawPatch(i, xOffset, yOffset, imageWidth, imageHeight)
 {
 	
 	if (i == -1)
@@ -1578,7 +1568,9 @@ function drawPatch(i, xOffset, yOffset)
 	console.log('Invalid Patch');
 	return false;
 	}
-
+	
+	console.log('Drawing patch: '+i+' at: '+xOffset+' '+yOffset);
+	
 	var canvas = document.getElementById('textureViewer');
 	var ctx = canvas.getContext("2d");
 
@@ -1589,6 +1581,8 @@ function drawPatch(i, xOffset, yOffset)
 
 	//canvas.width = header_width;
 	//canvas.height = header_height;
+	
+	console.log(header_width+' '+header_height+' '+header_left_offset+' '+header_top_offset);
 	
 	var post_offset = 8;
 	
@@ -1640,7 +1634,7 @@ function drawPatch(i, xOffset, yOffset)
 		
 					var pal = read1ByteNumberFromContent(i, image_offset);
 					//console.log(pal);
-					setPixel(j+xOffset, k+yOffset, WAD.palette[pal].r, WAD.palette[pal].g, WAD.palette[pal].b, 255); 
+					setPixel(j+xOffset, imageWidth, k+yOffset, imageHeight, WAD.palette[pal].r, WAD.palette[pal].g, WAD.palette[pal].b, 255); 
 		
 					image_offset++;
 				
@@ -1704,10 +1698,10 @@ function parseTextureDirectory(i)
 		{
 		
 			WAD.textures[j].patches[k] = new Object();
-			WAD.textures[j].patches[k].xOffset = read2ByteNumberFromContent(i, textureOffset);
+			WAD.textures[j].patches[k].xOffset = read2ByteSignedNumberFromContent(i, textureOffset);
 			textureOffset = textureOffset + 2;
 		
-			WAD.textures[j].patches[k].yOffset = read2ByteNumberFromContent(i, textureOffset);
+			WAD.textures[j].patches[k].yOffset = read2ByteSignedNumberFromContent(i, textureOffset);
 			textureOffset = textureOffset + 2;
 		
 			WAD.textures[j].patches[k].pNum = read2ByteNumberFromContent(i, textureOffset);
@@ -1732,11 +1726,10 @@ console.log('Parsing Texture Directory Complete');
 
 function LoadFile(evt)
 {
-var reader = new FileReader();
-reader.onerror = errorHandler;
-reader.onload = completeHandler;
-reader.readAsBinaryString(evt.target.files[0]);
-
+	var reader = new FileReader();
+	reader.onerror = errorHandler;
+	reader.onload = completeHandler;
+	reader.readAsBinaryString(evt.target.files[0]);
 }
 
 function errorHandler(evt)
@@ -1788,21 +1781,31 @@ function read8ByteCharactersFromContent(i,location)
 	return output;
 }
 
-
-
 function read4ByteNumber(location)
 {
-
-
 	var output = WAD.file.charCodeAt(location)*(1) + WAD.file.charCodeAt(location+1)*(256) + WAD.file.charCodeAt(location+2)*(256*256) + WAD.file.charCodeAt(location+3)*(256*256*256);
 	return output;
 	
 }
 
-
 function read1ByteNumberFromContent(i, location)
 {
 	return WAD.lumps[i].content.charCodeAt(location);
+}
+
+
+
+function read2ByteSignedNumberFromContent(i, location)
+{
+	var number = WAD.lumps[i].content.charCodeAt(location) + WAD.lumps[i].content.charCodeAt(location + 1)*(256);
+	
+	
+	if (number > 32767)
+		{
+		number = number - 65536;
+		}
+		
+	return number;
 }
 
 
@@ -1815,7 +1818,7 @@ function read4ByteNumberFromContent(i, location)
 {
 	return WAD.lumps[i].content.charCodeAt(location) + WAD.lumps[i].content.charCodeAt(location + 1)*(256) + WAD.lumps[i].content.charCodeAt(location + 2)*(256*256) + WAD.lumps[i].content.charCodeAt(location + 3)*(256*256*256);
 }
-
+/*
 function setPixel(x, y, r, g, b, a) {
     var index = (x + y * imageData.width) * 4;
     imageData.data[index+0] = r;
@@ -1823,7 +1826,20 @@ function setPixel(x, y, r, g, b, a) {
     imageData.data[index+2] = b;
     imageData.data[index+3] = a;
 }
-
+*/
+function setPixel(x, width, y, height, r, g, b, a) {
+    
+    if ((x >= width)||(x < 0)||(y>=height)||(y<0))
+    {
+    return -1;
+    }
+    
+    var index = (x + y * imageData.width) * 4;
+    imageData.data[index+0] = r;
+    imageData.data[index+1] = g;
+    imageData.data[index+2] = b;
+    imageData.data[index+3] = a;
+}
 
 function findLump(name)
 {
