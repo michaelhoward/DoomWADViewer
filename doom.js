@@ -631,7 +631,8 @@ function parseSFX(i)
 	
 	console.log(start+' '+sampleRate+' '+samples+' '+end);
 	
-	WAD.buffer = WAD.context.createBuffer(1, samples, sampleRate*2);
+	WAD.buffer = WAD.context.createBuffer(1, samples*2, sampleRate*2);
+	
 	
 	var buf = WAD.buffer.getChannelData(0);
 	
@@ -639,10 +640,7 @@ function parseSFX(i)
 	{
 		var sample = read1ByteNumberFromContent(i, sfxOffset);
 		buf[j] = sample/255;
-		buf[j+1] = sample/255;
-		//buf[j+2] = sample/255;
-		//buf[j+3] = sample/255;
-		
+		buf[j+1] = sample/255;	
 		sfxOffset++;
 		
 	}
@@ -657,8 +655,8 @@ function playSFX()
 	WAD.source = WAD.context.createBufferSource(0);
 	WAD.source.buffer = WAD.buffer;
 	WAD.source.connect(WAD.context.destination);
-	WAD.source.noteOn( WAD.context.currentTime);
-	
+	//WAD.source.noteOn( WAD.context.currentTime);
+	WAD.source.noteOn(0);
 	
 }
 
@@ -1089,8 +1087,13 @@ function parseFlat(i)
 	canvas.width = 64;
 	canvas.height = 64;
 	
-	ctx.fillStyle = 'black';
-	ctx.fillRect(0,0,64,64);
+	
+	
+	if (document.getElementById('background').checked == true)
+	{
+		ctx.fillStyle = 'black';
+		ctx.fillRect(0,0,64,64);
+	}
 	
 	imageData = ctx.getImageData(0,0,64, 64);
 	
@@ -1214,8 +1217,11 @@ function parseImage(i)
 	
 	var post_offset = 8;
 	
-	ctx.fillStyle = 'black';
-	ctx.fillRect(0,0,header_width,header_height);
+	if (document.getElementById('background').checked == true)
+	{
+		ctx.fillStyle = 'black';
+		ctx.fillRect(0,0,header_width,header_height);
+	}
 	
 	imageData = ctx.getImageData(0,0,header_width, header_height);
 	
@@ -1831,7 +1837,7 @@ function setPixel(x, width, y, height, r, g, b, a) {
     
     if ((x >= width)||(x < 0)||(y>=height)||(y<0))
     {
-    return -1;
+    	return -1;
     }
     
     var index = (x + y * imageData.width) * 4;
@@ -1855,13 +1861,11 @@ return -1;
 
 function toggleVis(element)
 {
-document.getElementById('flats').style.visibility= "hidden";
-document.getElementById('images').style.visibility= "hidden";
-document.getElementById('maps').style.visibility= "hidden";
-document.getElementById('sounds').style.visibility= "hidden";
-document.getElementById('misc').style.visibility= "hidden";
-document.getElementById('textures').style.visibility= "hidden";
-document.getElementById(element).style.visibility= "visible";
-
-
+	document.getElementById('flats').style.visibility= "hidden";
+	document.getElementById('images').style.visibility= "hidden";
+	document.getElementById('maps').style.visibility= "hidden";
+	document.getElementById('sounds').style.visibility= "hidden";
+	document.getElementById('misc').style.visibility= "hidden";
+	document.getElementById('textures').style.visibility= "hidden";
+	document.getElementById(element).style.visibility= "visible";
 }
