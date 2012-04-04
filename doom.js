@@ -63,11 +63,16 @@ function parseWAD()
 		{
 		// we're parsing flats, if its the end flag, stop parsing flats
 	
-		if (WAD.lumps[i].name == 'F_END\0\0\0')
+		if ((WAD.lumps[i].name.slice(0,2) == 'F1')||(WAD.lumps[i].name.slice(0,2) == 'F2'))
+		{
+		// ignore the F1_START F2_END etc
+		
+		}
+		else if (WAD.lumps[i].name == 'F_END\0\0\0')
 		{
 			flats = false;	
 		}
-		
+				
 		else
 		{
 			addOptionToFlatSelector(i);
@@ -142,7 +147,8 @@ function parseWAD()
 	case "PFUB1\0\0\0":
 	case "PFUB2\0\0\0":
 	case "AUTOPAGE":	
-	
+	case "ENDPIC\0\0":
+	case "INTERPIC":
 	addOptionToImageSelector(i, 'miscImageSelector');
 	break;
 	
@@ -296,6 +302,18 @@ function parseWAD()
 	case "STCDROM\0":
 	case "STARMS\0\0":
 	
+	
+	//Heretic
+	case "FACEA0\0\0":
+	case "FACEA1\0\0":
+	case "FACEA2\0\0":
+	case "FACEA3\0\0":
+	case "FACEB0\0\0":
+	case "FACEB1\0\0":
+	case "FACEB2\0\0":
+	case "FACEB3\0\0":
+	
+	
 	addOptionToImageSelector(i, 'uiImageSelector');
 	break;
 	 
@@ -320,9 +338,10 @@ function parseWAD()
 	
 	//flats - floor/ceiling textures
 	case "F_START\0":
-	// flat starts
+	//start flats
 	flats = true;
 	break;
+	
 	
 	case "P_START\0":
 	patches = true;
@@ -341,6 +360,9 @@ function parseWAD()
 	case "DEMO1\0\0\0":
 	case "DEMO2\0\0\0":
 	case "DEMO3\0\0\0":
+	case "DEMO4\0\0\0":
+	case "DEMO5\0\0\0":
+	
 	break; 
 	
 	
@@ -373,6 +395,15 @@ function parseWAD()
 	case "E3M7\0\0\0\0":
 	case "E3M8\0\0\0\0":
 	case "E3M9\0\0\0\0":
+	case "E4M1\0\0\0\0":
+	case "E4M2\0\0\0\0":
+	case "E4M3\0\0\0\0":
+	case "E4M4\0\0\0\0":
+	case "E4M5\0\0\0\0":
+	case "E4M6\0\0\0\0":
+	case "E4M7\0\0\0\0":
+	case "E4M8\0\0\0\0":
+	case "E4M9\0\0\0\0":
 	//console.log(i);
 	addMap(i);
 	
@@ -380,18 +411,19 @@ function parseWAD()
 	break;
 	case "THINGS\0\0":
 	//things
-	parseThings(i);
+		parseThings(i);
 	break;
 	
 	case "LINEDEFS":
-	 parseLineDefs(i);
+		parseLineDefs(i);
 	break;
 	
 	case "SIDEDEFS":
+		parseSideDefs(i);
 	break;
 	
 	case "VERTEXES":
-	parseVertices(i);
+		parseVertices(i);
 	break;
 	
 	case "SEGS\0\0\0\0":
@@ -404,6 +436,7 @@ function parseWAD()
 	break;
 	
 	case "SECTORS\0":
+		parseSectors(i);
 	break;
 	
 	case "REJECT\0\0":
@@ -560,6 +593,16 @@ function parseWAD()
 	break;
 	
 	}
+
+	if (WAD.lumps[i].name.slice(0,4) == "FONT")
+	{ // Heretic UI
+	
+	addOptionToImageSelector(i, 'uiImageSelector');
+	
+	break;
+	
+	}
+	
 	
 			if (WAD.lumps[i].name.slice(0,4) == "BRDR")
 	{ // UI
@@ -609,11 +652,11 @@ function addOptionToSFXSelector(i)
 function changeSFX(evt)
 {
 //console.log(evt);
-	parseSFX(evt.target.value);
+	parseSFX(evt.target.value, true);
 }
 
 
-function parseSFX(i)
+function parseSFX(i, autoPlay)
 {
 	var sfxOffset = 0;
 	
@@ -645,7 +688,10 @@ function parseSFX(i)
 		
 	}
 	
-	playSFX();
+	if (autoPlay)
+	{
+		playSFX();
+	}
 }
 
 function playSFX()
@@ -695,25 +741,12 @@ function parseThings(i)
 	{
 		
 		WAD.maps[currentMap].things[j] = new Object();
-		WAD.maps[currentMap].things[j].xPos = read2ByteNumberFromContent(i, thingOffset);
+		WAD.maps[currentMap].things[j].xPos = read2ByteSignedNumberFromContent(i, thingOffset);
 		thingOffset = thingOffset + 2;
-		
-		if (WAD.maps[currentMap].things[j].xPos > 32767)
-		{
-		WAD.maps[currentMap].things[j].xPos = parseInt(WAD.maps[currentMap].things[j].xPos) - 65536;
-		}
-		
-		
-		
-		WAD.maps[currentMap].things[j].yPos = read2ByteNumberFromContent(i, thingOffset);
+	
+		WAD.maps[currentMap].things[j].yPos = read2ByteSignedNumberFromContent(i, thingOffset);
 		thingOffset = thingOffset + 2;
-		
-		if (WAD.maps[currentMap].things[j].yPos > 32767)
-		{
-			WAD.maps[currentMap].things[j].yPos = parseInt(WAD.maps[currentMap].things[j].yPos) - 65536;
-		}
-		
-		
+
 		WAD.maps[currentMap].things[j].angle = read2ByteNumberFromContent(i, thingOffset);
 		thingOffset = thingOffset + 2;
 		
@@ -722,10 +755,6 @@ function parseThings(i)
 		
 		WAD.maps[currentMap].things[j].options = read2ByteNumberFromContent(i, thingOffset);
 		thingOffset = thingOffset + 2;
-		
-		
-		
-		
 		
 	}
 
@@ -802,6 +831,84 @@ function parseVertices(i)
 	}
 }
 
+function parseSectors(i)
+{
+	var currentMap = WAD.maps.length - 1;
+	WAD.maps[currentMap].sectors = new Array();	
+	var sectorCount = WAD.lumps[i].content.length / 26;
+	
+	console.log('Parse sectors for map: '+currentMap+' Sector: '+sectorCount);
+	
+	var sectorOffset = 0;
+	
+	for (var j=0; j<sectorCount; j++)
+	{
+		WAD.maps[currentMap].sectors[j] = new Object();
+		WAD.maps[currentMap].sectors[j].floorHeight = read2ByteSignedNumberFromContent(i, sectorOffset);
+		sectorOffset = sectorOffset + 2;
+		
+		WAD.maps[currentMap].sectors[j].ceilingHeight = read2ByteSignedNumberFromContent(i, sectorOffset);
+		sectorOffset = sectorOffset + 2;
+		
+		WAD.maps[currentMap].sidedefs[j].ceilingFlat = read8ByteCharactersFromContent(i,sectorOffset);
+		sectorOffset = sectorOffset + 8;
+		
+		WAD.maps[currentMap].sidedefs[j].floorFlat = read8ByteCharactersFromContent(i,sectorOffset);
+		sectorOffset = sectorOffset + 8;		
+	
+		WAD.maps[currentMap].sectors[j].lightLevel = read2ByteNumberFromContent(i, sectorOffset);
+		sectorOffset = sectorOffset + 2;	
+		
+		WAD.maps[currentMap].sectors[j].specialSector = read2ByteNumberFromContent(i, sectorOffset);
+		sectorOffset = sectorOffset + 2;	
+		
+		WAD.maps[currentMap].sectors[j].tagNumber = read2ByteNumberFromContent(i, sectorOffset);
+		sectorOffset = sectorOffset + 2;	
+		
+	}
+
+}
+
+function parseSideDefs(i)
+{
+	var currentMap = WAD.maps.length - 1;
+	
+	WAD.maps[currentMap].sidedefs = new Array();
+	
+	var sideCount = WAD.lumps[i].content.length / 30;
+	
+	console.log('Parse SideDefs for map: '+currentMap+' Sidecount: '+sideCount);
+	
+	var sideOffset = 0;
+	
+	for (var j=0; j<sideCount; j++)
+	{
+		WAD.maps[currentMap].sidedefs[j] = new Object();
+		
+		WAD.maps[currentMap].sidedefs[j].xOffset = read2ByteSignedNumberFromContent(i, sideOffset);
+		sideOffset = sideOffset + 2;
+		
+		WAD.maps[currentMap].sidedefs[j].yOffset = read2ByteSignedNumberFromContent(i, sideOffset);
+		sideOffset = sideOffset + 2;
+		
+		WAD.maps[currentMap].sidedefs[j].upperTexture = read8ByteCharactersFromContent(i,sideOffset);
+		sideOffset = sideOffset + 8;
+		
+		WAD.maps[currentMap].sidedefs[j].lowerTexture = read8ByteCharactersFromContent(i,sideOffset);
+		sideOffset = sideOffset + 8;
+		
+		WAD.maps[currentMap].sidedefs[j].middleTexture = read8ByteCharactersFromContent(i,sideOffset);
+		sideOffset = sideOffset + 8;
+		
+		
+		WAD.maps[currentMap].sidedefs[j].sector = read2ByteSignedNumberFromContent(i, sideOffset);
+		sideOffset = sideOffset + 2;
+		
+	}
+	
+	
+}
+
 
 function parseLineDefs(i)
 {
@@ -811,7 +918,7 @@ function parseLineDefs(i)
 	
 	var lineCount = WAD.lumps[i].content.length / 14;
 
-	console.log('Parse Linedefs for map: '+currentMap+' Linecount: '+lineCount);
+	console.log('Parse LineDefs for map: '+currentMap+' Linecount: '+lineCount);
 	var lineOffset =0;
 
 	for (var j=0; j<lineCount; j++)
@@ -1763,6 +1870,16 @@ function completeHandler(evt)
 	LoadDirectory();
 
 	parseWAD();
+	
+	//parse the default values
+	parseSFX(document.getElementById('sfxSelector').value, false);
+	drawMap(document.getElementById('mapSelector').value);
+	parseFlat(document.getElementById('flatSelector').value);
+	parseTexture(document.getElementById('textureSelector').value);
+	parseImage(document.getElementById('enemyImageSelector').value);
+
+	
+	
 }
 
 // Utility Functions

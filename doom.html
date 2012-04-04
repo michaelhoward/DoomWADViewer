@@ -6,7 +6,6 @@
 <meta name="description" content="A HTML5/Javascript DOOM WAD viewer" />
 <meta name="keywords" content="DOOM, Heretic, WAD, iWAD, pWAD, HTML5,Javascript,viewer" />
 
-
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
@@ -28,7 +27,7 @@
 </div>
 <br>
 
-<input type='file' id='fileloader'></input><br><input type='checkbox' id='background'>Black Background</input><br>
+<input type='file' id='fileloader' style='font-family: Courier; font-size:10px'></input><br>
 
 <div id='description' style='font-family: Courier; font-size:10px'>
 Free shareware files can be obtained: <a href="http://www.dosgamers.com/dos/dos-games/doom-heretic-hexen">here</a>. This tool is currently optimised for the Doom shareware WAD.</div> <br>
@@ -38,8 +37,8 @@ Free shareware files can be obtained: <a href="http://www.dosgamers.com/dos/dos-
 <button id='map_tab' onclick="toggleVis('maps')">Maps</button><button id='sounds_tab'  onclick="toggleVis('sounds')">Sound and Music</button><button id='misc_tab'  onclick="toggleVis('misc')">Misc</button><br>
 
 
-<div id='images' style='position:absolute; top:150px; border:solid 1px black; visibility:hidden;'>
-
+<div id='images' style='position:absolute; top:150px; border:solid 1px black; visibility:hidden;font-family: Courier; font-size:10px'>
+<input type='checkbox' id='background'>Black Background</input><br>
 <br>
 <table style='table-layout:fixed'>
 
@@ -85,7 +84,7 @@ Game Palette:<br>
 </div>
 
 
-<div id='flats' style='position:absolute; top:150px; border:solid 1px black; visibility:hidden;'>
+<div id='flats' style='position:absolute; top:150px; border:solid 1px black; visibility:hidden;font-family: Courier; font-size:10px'>
 Floor/Ceiling Texture: <select id='flatSelector'></select><br>
 Source Data:<br>
 <canvas id='flatViewer'style='border:solid 1px black' width=1px height=1px></canvas><canvas id='intermediateFlat' style='visibility:hidden; display:none'></canvas><br>
@@ -93,7 +92,7 @@ Tiled Output:<br>
 <img id='finalFlats'></img>
 </div>
 
-<div id='textures' style='position:absolute; top:150px; border:solid 1px black; visibility:hidden;'>
+<div id='textures' style='position:absolute; top:150px; border:solid 1px black; visibility:hidden;font-family: Courier; font-size:10px'>
 Wall Texture: 
 <select id='textureSelector'></select><br>
 
@@ -114,7 +113,7 @@ Zoom: <select id='zoomTexture' onchange=zoomTexture()>
 </div>
 
 
-<div id='maps' style='position:absolute; top:150px; border:solid 1px black; visibility:hidden;'>
+<div id='maps' style='position:absolute; top:150px; border:solid 1px black; visibility:hidden;font-family: Courier; font-size:10px'>
 Key:<br>
 <table>
 <tr><td style='background-color:white'>&nbsp;&nbsp;</td><td>Player Spawns</td></tr>
@@ -133,12 +132,12 @@ Original:<br>
 
 </div>
 
-<div id='sounds'  style='position:absolute; top:150px; border:solid 1px black; visibility:hidden;'>
+<div id='sounds'  style='position:absolute; top:150px; border:solid 1px black; visibility:hidden;font-family: Courier; font-size:10px'>
 <select id='sfxSelector'></select> <button id='playSFX' onclick='playSFX()'>Play</button><br> 
 
 </div>
 
-<div id='misc' style='position:absolute; top:150px; border:solid 1px black; visibility:hidden;'>
+<div id='misc' style='position:absolute; top:150px; border:solid 1px black; visibility:hidden;font-family: Courier; font-size:10px'>
 Text on Exiting Game:<br><div id='endoom' style='font-family: Courier'></div>
 </div>
 
